@@ -13,7 +13,7 @@ class LightSpeedProperty < LightSpeedPropertyBase
     result = ""
     0.upto(tabindex-1) { tabs << "\t" }
     
-    result << validate_presence_attribute(tabs) unless ( nullable? || is_reserved_property_name?)
+    result << validate_presence_attribute(tabs) if should_validate_presence?
     result << "#{tabs}[ValidateUnique]\n" if unique?
     result << "#{tabs}private #{clr_type} _#{name.camelcase(:lower)};\n"
   end
@@ -44,8 +44,16 @@ class LightSpeedProperty < LightSpeedPropertyBase
     end
     
     def is_reserved_property_name?
-      %w(LockVersion CreatedOn DeletedOn UpdatedOn).any? {|reserved| reserved == name }
-     
+      %w(LockVersion CreatedOn DeletedOn UpdatedOn).any? {|reserved| reserved == name }     
+    end
+    
+    def is_non_nullable_type?
+      %w(short byte long int double bool decimal float).any?{ |t| t == clr_type}
+    end
+    
+    def should_validate_presence?
+      result =  !!!( (!foreign_key? && is_non_nullable_type?) ||  nullable?    || is_reserved_property_name?)
+      result
     end
   
 end
