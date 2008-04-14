@@ -15,7 +15,7 @@ class LightSpeedRepository
   include REXML
   
   attr_reader :entities
-  attr_accessor :namespace, :excluded_tables
+  attr_accessor :namespace, :excluded_tables, :entity_base
   
   DEFAULT_REFERENCES = ["System", "Mindscape.LightSpeed", "Mindscape.LightSpeed.Validation", "Mindscape.LightSpeed.Linq"]
 
@@ -197,7 +197,8 @@ class LightSpeedRepository
       file_content << "using System.Collections.Generic;\n" if entity.has_through_associations?
       
       file_content << "\nnamespace #{entity.namespace}\n{\n"
-      file_content << (block_given? ? "\tpublic partial class #{entity.name} : Entity<#{entity.pk_type}>" : "\tpublic partial class #{entity.name}")
+      eb = (entity_base.nil? || entity_base.empty?) ? "Entity<#{entity.pk_type}>" : entity_base
+      file_content << (block_given? ? "\tpublic partial class #{entity.name} : #{eb}" : "\tpublic partial class #{entity.name}")
       file_content << "\n\t{\n"
       
       yield file_content, 2 if block_given?
