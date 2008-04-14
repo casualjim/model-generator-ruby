@@ -6,8 +6,12 @@ class LightSpeedHasMany < LightSpeedPropertyBase
    
   end
   
-  def should_generate?(user_file_content)
+  def should_generate_field?(user_file_content)
     Regexp.compile("EntityCollection<#{class_name}>\s+_#{name.camelcase(:lower)}").match(user_file_content).nil?
+  end
+  
+  def should_generate_property?(user_file_content)
+    Regexp.compile("EntityCollection<#{class_name}>\s+_#{name}").match(user_file_content).nil?
   end
   
   def to_field(tabindex = 0)
