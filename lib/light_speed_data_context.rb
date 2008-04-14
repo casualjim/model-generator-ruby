@@ -7,13 +7,14 @@ class LightSpeedDataContext
   
   DEFAULT_REFERENCES = ["System.Linq", "Mindscape.LightSpeed.Linq"]
   
-  def initialize(namespace, model_path, context_name)
+  def initialize(namespace, model_path, context_name, relative_model_path)
     @namespace = namespace
     @model_path = model_path
     @context_name = context_name || "#{@namespace.split('.')[0]}DataContext"
     @entities = []
     @user_file_content = ""
     @should_read_user_file = true
+	@relative_model_path = relative_model_path
   end
   
   def add_entity(entity)
@@ -30,7 +31,7 @@ class LightSpeedDataContext
       unless doc.elements.to_a('//Compile').any?{ |e| e.attributes['Include'] === "I#{@context_name}.cs"}
             
         u_el = Element.new "Compile"
-        u_el.attributes["Include"] = "I#{@context_name}.cs"
+        u_el.attributes["Include"] = "#{@relative_model_path}I#{@context_name}.cs"
 
         unless doc.elements['//Compile'].nil?
           parent = doc.elements['//Compile'].parent

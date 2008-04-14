@@ -23,7 +23,7 @@ class LightSpeedRepository
     @entities = []
     @project_file_location = project_file_location
     @namespace = namespace || File.basename(project_file_location, ".csproj")
-    @model_path = model_path || File.dirname(project_file_location)
+    @model_path = model_path || File.dirname(project_file_location)	
     @context_name = context_name || "#{@namespace.split('.')[0]}DataContext"
     puts "Will append files to #{@project_file_location}"
     puts "Models will be saved to #{@model_path}"
@@ -92,7 +92,7 @@ class LightSpeedRepository
     proj_file = File.new(@project_file_location)
     doc = Document.new proj_file
     updates_project_file = false
-    data_context = LightSpeedDataContext.new @namespace, @model_path, @context_name
+    data_context = LightSpeedDataContext.new @namespace, @model_path, @context_name, relative_model_path
     @entities.each do |entity|
       did_update = generate_files_for entity
       
@@ -163,12 +163,18 @@ class LightSpeedRepository
   
   private
   
+	def relative_model_path
+		proj_dir = File.dirname(@project_file_location)
+		rel_model_path = @model_path.gsub(/#{proj_dir}/, "")
+		rel_model_path.empty? ? "" : "#{rel_model_path}/"
+	end
+  
     def add_file_reference_to_project_file(file_name, doc)
       unless doc.elements.to_a('//Compile').any?{ |e| e.attributes['Include'] === "#{file_name}.cs"}
         u_el = Element.new "Compile"
-        u_el.attributes["Include"] = "#{file_name}.cs"
+        u_el.attributes["Include"] = "#{relative_model_path}#{file_name}.cs"
         el = Element.new "Compile"
-        el.attributes["Include"] = "#{file_name}.lightspeed.cs"
+        el.attributes["Include"] = "#{relative_model_path}#{file_name}.lightspeed.cs"
         dep_el = Element.new "DependentUpon"
         dep_el.text = "#{file_name}.cs"
         el.add_element dep_el
