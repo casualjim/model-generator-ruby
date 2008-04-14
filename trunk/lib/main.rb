@@ -11,14 +11,17 @@ include REXML
 
 require dir + '/light_speed_repository'
 
-proj_file_location = ARGV[0] || Dir['*.csproj'][0]
+require dir + '/command_args'
 
-if proj_file_location.nil? or proj_file_location.empty?
+args = CommandArgs.new(ARGV)
+
+if args[:project_file].nil? || args[:project_file].empty?
 	puts "Please specify a path to the csproj file to append the model files to."
 end
 
-#puts proj_file_location
+ls = LightSpeedRepository.new args[:project_file], args[:namespace], args[:datacontext_prefix], args[:model_path]
 
-ls = LightSpeedRepository.new proj_file_location, ARGV[1], ARGV[2], ARGV[3]
+ls.entity_base = args[:base_class] unless args[:base_class].nil? || args[:base_class].empty?
+
 ls.excluded_tables = %w(KeyTable sysdiagrams ModuleVersions)
 ls.add_files_to_vs_project
