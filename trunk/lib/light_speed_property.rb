@@ -4,8 +4,12 @@ class LightSpeedProperty < LightSpeedPropertyBase
     super
   end
   
-  def should_generate?(user_file_content)
+  def should_generate_field?(user_file_content)
     Regexp.compile("#{clr_type!}\\??\s+_#{name.camelcase(:lower)}", Regexp::MULTILINE).match(user_file_content).nil?
+  end
+  
+  def should_generate_property?(user_file_content)
+    Regexp.compile("#{clr_type!}\\??\s+_#{name}", Regexp::MULTILINE).match(user_file_content).nil?
   end
   
   def to_field(tabindex = 0)

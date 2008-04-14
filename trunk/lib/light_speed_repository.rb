@@ -126,11 +126,9 @@ class LightSpeedRepository
         rendered_fields, rendered_properties = "", ""
         
         %w(properties belongs_to has_many through_associations).each do |method|
-          entity.send(method.to_sym).each do |prop|
-            if prop.should_generate?(ufile_content)
-              rendered_fields << prop.to_field(tabindex)
-              rendered_properties << prop.to_property(tabindex)
-            end
+          entity.send(method.to_sym).each do |prop|            
+              rendered_fields << prop.to_field(tabindex) if prop.should_generate_field?(ufile_content)
+              rendered_properties << prop.to_property(tabindex) if prop.should_generate_property?(ufile_content)
           end
         end
         

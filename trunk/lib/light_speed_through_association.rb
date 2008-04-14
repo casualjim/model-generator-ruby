@@ -5,8 +5,12 @@ class LightSpeedThroughAssociation < LightSpeedPropertyBase
     super
   end
   
-  def should_generate?(user_file_content)
+  def should_generate_field?(user_file_content)
     Regexp.compile("#{through_type_name}\s+_#{name.camelcase(:lower).pluralize}").match(user_file_content).nil?
+  end
+  
+  def should_generate_property?(user_file_content)
+    Regexp.compile("#{through_type_name}\s+_#{name.pluralize}").match(user_file_content).nil?
   end
   
   def to_field(tabindex = 0)
