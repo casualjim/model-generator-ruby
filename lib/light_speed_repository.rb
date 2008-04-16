@@ -23,7 +23,7 @@ class LightSpeedRepository
     @entities = []
     @project_file_location = project_file_location
     @namespace = namespace || File.basename(project_file_location, ".csproj")
-    @model_path = model_path || File.dirname(project_file_location)	
+    @model_path = File.expand_path(model_path) || File.dirname(project_file_location)	
     @context_name = context_name || "#{@namespace.split('.')[0]}DataContext"
     puts "Will append files to #{@project_file_location}"
     puts "Models will be saved to #{@model_path}"
@@ -162,9 +162,9 @@ class LightSpeedRepository
   private
   
 	def relative_model_path
-		proj_dir = File.dirname(@project_file_location)
-		rel_model_path = @model_path.gsub(/#{proj_dir}/, "")
-		rel_model_path.empty? ? "" : "#{rel_model_path}/"
+		proj_dir = File.expand_path(File.dirname(@project_file_location))
+		rel_model_path = @model_path.gsub(/#{proj_dir}\//, "")
+		rel_model_path.empty? ? "" : "#{rel_model_path}\\"
 	end
   
     def add_file_reference_to_project_file(file_name, doc)
